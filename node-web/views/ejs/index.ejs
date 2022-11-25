@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="css/style.css" rel="stylesheet">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    .bd-placeholder-img {
+      font-size: 1.125rem;
+      text-anchor: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+    }
+
+    @media (min-width: 768px) {
+      .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+      }
+    }
+
+    .b-example-divider {
+      height: 3rem;
+      background-color: rgba(0, 0, 0, .1);
+      border: solid rgba(0, 0, 0, .15);
+      border-width: 1px 0;
+      box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+    }
+
+    .bi {
+      vertical-align: -.125em;
+      fill: currentColor;
+    }
+
+    .feature-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 4rem;
+      height: 4rem;
+      margin-bottom: 1rem;
+      font-size: 2rem;
+      color: #fff;
+      border-radius: .75rem;
+    }
+
+    .icon-link {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .icon-link>.bi {
+      margin-top: .125rem;
+      margin-left: .125rem;
+      transition: transform .25s ease-in-out;
+      fill: currentColor;
+    }
+
+    .icon-link:hover>.bi {
+      transform: translate(.25rem);
+    }
+
+    .icon-square {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 3rem;
+      height: 3rem;
+      font-size: 1.5rem;
+      border-radius: .75rem;
+    }
+
+    .rounded-4 {
+      border-radius: .5rem;
+    }
+
+    .rounded-5 {
+      border-radius: 1rem;
+    }
+
+    .text-shadow-1 {
+      text-shadow: 0 .125rem .25rem rgba(0, 0, 0, .25);
+    }
+
+    .text-shadow-2 {
+      text-shadow: 0 .25rem .5rem rgba(0, 0, 0, .25);
+    }
+
+    .text-shadow-3 {
+      text-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .25);
+    }
+
+    .card-cover {
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+    }
+  </style>
+
+  <title>Aplicações Distribuidas</title>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-6">
+        <h3 class="text-info text-center">
+          STATUS ATUAL DO ALARME
+        </h3>
+        <button id="buttonStatus" type="button" class="btn btn-md btn-success btn-block">
+        </button>
+      </div>
+      <div class="col-md-6">
+        <button onClick="showOnlyStatus()" type="button" class="btn btn-md btn-success btn-block">Mostrar só status do
+          alarme
+        </button>
+        <button onClick="showOnlyCommands()" type="button" class="btn btn-md btn-success btn-block">Mostrar só comandos
+        </button>
+        <button onClick="allowLogUpdate()" type="button" class="btn btn-md btn-success btn-block">Mostrar Tudo
+        </button>
+        <div class="table-responsive">
+          <table id="solucoesTable" class="table table-striped table-sm">
+            <thead>
+              <tr>
+                <th scope="col">LOG ID</th>
+                <th scope="col">DADO SENSOR</th>
+                <th scope="col">COMANDO</th>
+                <th scope="col">HORARIO</th>
+              </tr>
+            </thead>
+            <tbody id="logs_table">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <link rel="stylesheet" href="/css/bootstrap.min.css" />
+</body>
+
+<script src="jquery-3.6.1.min.js"></script>
+<script src="popper.min.js"></script>
+<script src="scripts.js"></script>
+
+<script>
+  var UPDATE_TAG = 0;
+
+  function updateAlarmeStatus() {
+    let dados = [];
+    $.ajax({
+      url: "/consulta_dados",
+      type: 'GET',
+      async: false,
+      dataType: 'json',
+      success: function (res) {
+        dados = res;
+        console.log(dados.dados);
+        dados.dados.forEach((e) => {
+          if (e.diference != null && (e.diference -7200) < 5) {
+            if (e.status === 1) {
+              $("#buttonStatus").text('ARMADO');
+              if ($("#buttonStatus").attr('class') === 'btn btn-md btn-warning btn-block' || $("#buttonStatus").attr('class') === 'btn btn-md btn-dark btn-block') {
+                $('#buttonStatus').removeClass('btn btn-md btn-warning btn-block')
+                $('#buttonStatus').removeClass('btn btn-md btn-dark btn-block')
+                $('#buttonStatus').addClass('btn btn-md btn-success btn-block')
+              } else if ($("#buttonStatus").attr('class') === 'btn btn-md btn-danger btn-block' || $("#buttonStatus").attr('class') === 'btn btn-md btn-dark btn-block') {
+                $('#buttonStatus').removeClass('btn btn-md btn-danger btn-block')
+                $('#buttonStatus').removeClass('btn btn-md btn-dark btn-block')
+                $('#buttonStatus').addClass('btn btn-md btn-success btn-block')
+              }
+            } else if (e.status === 2) {
+              $("#buttonStatus").text('DESARMADO');
+              if ($("#buttonStatus").attr('class') === 'btn btn-md btn-success btn-block' || $("#buttonStatus").attr('class') === 'btn btn-md btn-dark btn-block') {
+                $('#buttonStatus').removeClass('btn btn-md btn-success btn-block')
+                $('#buttonStatus').removeClass('btn btn-md btn-dark btn-block')
+                $('#buttonStatus').addClass('btn btn-md btn-warning btn-block')
+              } else if ($("#buttonStatus").attr('class') === 'btn btn-md btn-danger btn-block' || $("#buttonStatus").attr('class') === 'btn btn-md btn-dark btn-block') {
+                $('#buttonStatus').removeClass('btn btn-md btn-danger btn-block')
+                $('#buttonStatus').removeClass('btn btn-md btn-dark btn-block')
+                $('#buttonStatus').addClass('btn btn-md btn-warning btn-block')
+              }
+            } else if (e.status === 3) {
+              $("#buttonStatus").text('DISPARADO');
+              if ($("#buttonStatus").attr('class') === 'btn btn-md btn-success btn-block' || $("#buttonStatus").attr('class') === 'btn btn-md btn-dark btn-block') {
+                $('#buttonStatus').removeClass('btn btn-md btn-success btn-block')
+                $('#buttonStatus').removeClass('btn btn-md btn-dark btn-block')
+                $('#buttonStatus').addClass('btn btn-md btn-danger btn-block')
+              } else if ($("#buttonStatus").attr('class') === 'btn btn-md btn-warning btn-block' || $("#buttonStatus").attr('class') === 'btn btn-md btn-dark btn-block') {
+                $('#buttonStatus').removeClass('btn btn-md btn-warning btn-block')
+                $('#buttonStatus').removeClass('btn btn-md btn-dark btn-block')
+                $('#buttonStatus').addClass('btn btn-md btn-danger btn-block')
+              }
+            };
+          }
+          if (e.diference != null && (e.diference -7200) > 5) {
+            $("#buttonStatus").text('SEM CONEXÃO');
+            $('#buttonStatus').removeClass('btn btn-md btn-warning btn-block')
+            $('#buttonStatus').removeClass('btn btn-md btn-success btn-block')
+            $('#buttonStatus').removeClass('btn btn-md btn-danger btn-block')
+            $('#buttonStatus').addClass('btn btn-md btn-dark btn-block')
+          }
+        })
+      }
+    });
+  };
+</script>
+<script>
+  function updateLogsTable() {
+    if (UPDATE_TAG == 0) {
+      let dados = [];
+      $.ajax({
+        url: "/consulta_logs",
+        type: 'GET',
+        async: false,
+        dataType: 'json',
+        success: function (res) {
+          dados = res;
+          $('#logs_table').empty();
+          dados.dados.forEach((e) => {
+            let log_row = '<tr><td class="align-middle">' + e.id + '</td>'
+            if (e.status != null) {
+              log_row += '<td class="align-middle">' + e.status + '</td>'
+            } else {
+              log_row += '<td class="align-middle">-</td>'
+            }
+            if (e.comando != null) {
+              log_row += '<td class="align-middle">' + e.comando + '</td>'
+            } else {
+              log_row += '<td class="align-middle">-</td>'
+            }
+            log_row += '<td class="align-middle">' + e.dt_exec + '</td></tr>'
+            $('#logs_table').append(log_row)
+          })
+        }
+      });
+    }
+  };
+
+  function allowLogUpdate() {
+    UPDATE_TAG = 0;
+  }
+
+</script>
+<script>
+  function showOnlyStatus() {
+    let dados = [];
+    UPDATE_TAG = 1;
+    $.ajax({
+      url: "/consulta_logs_status",
+      type: 'GET',
+      async: false,
+      dataType: 'json',
+      success: function (res) {
+        dados = res;
+        $('#logs_table').empty();
+        dados.dados.forEach((e) => {
+            let log_row = '<tr><td class="align-middle">' + e.id + '</td>'
+            if (e.status != null) {
+              log_row += '<td class="align-middle">' + e.status + '</td>'
+            } else {
+              log_row += '<td class="align-middle">-</td>'
+            }
+            if (e.comando != null) {
+              log_row += '<td class="align-middle">' + e.comando + '</td>'
+            } else {
+              log_row += '<td class="align-middle">-</td>'
+            }
+            log_row += '<td class="align-middle">' + e.dt_exec + '</td></tr>'
+            $('#logs_table').append(log_row)
+          })
+        }
+      });
+  };
+
+  function showOnlyCommands() {
+    let dados = [];
+    UPDATE_TAG = 1;
+    $.ajax({
+      url: "/consulta_logs_comandos",
+      type: 'GET',
+      async: false,
+      dataType: 'json',
+      success: function (res) {
+        dados = res;
+        $('#logs_table').empty();
+        dados.dados.forEach((e) => {
+            let log_row = '<tr><td class="align-middle">' + e.id + '</td>'
+            if (e.status != null) {
+              log_row += '<td class="align-middle">' + e.status + '</td>'
+            } else {
+              log_row += '<td class="align-middle">-</td>'
+            }
+            if (e.comando != null) {
+              log_row += '<td class="align-middle">' + e.comando + '</td>'
+            } else {
+              log_row += '<td class="align-middle">-</td>'
+            }
+            log_row += '<td class="align-middle">' + e.dt_exec + '</td></tr>'
+            $('#logs_table').append(log_row)
+          })
+        }
+      });
+  };
+
+</script>
+
+<script>
+  setInterval(updateAlarmeStatus, 2000);
+  setInterval(updateLogsTable, 3000);
+</script>
+
+</html>

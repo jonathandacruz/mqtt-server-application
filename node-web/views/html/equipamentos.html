@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <!--<meta http-equiv="refresh" content="4">-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title>Equipamentos</title>
+</head>
+
+<body>
+    $cabecalho$
+    </div>
+    <div class="container">
+        <div class="container">
+            <div class="row">
+                $divChart$
+                $divChartESP$
+            </div>
+        </div>
+        <div aria-live="polite" aria-atomic="true" style="min-height: 0px;">
+            <div id="notificacoes" style="position: absolute; top: 30px; left: 30px;">
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    $dataChart$
+    $startChart$
+
+    $dataChartESP$
+    $startChartESP$
+
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.6/dist/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+
+    <script>
+        var scripts = document.getElementsByTagName("script");
+        var realCount = 0;
+        var a = [];
+        var b = [];
+        var listaToast = [];
+        var listaPcs = [];
+        var objectPc = {};
+        var j = 0;
+        var name = '';
+        var espData;
+        var cpuData;
+        var ramData;
+        var hdData;
+        var replaceNotifications = "";
+        let dataAtual;
+
+        var notTemplate = `
+        <div class="toast" id="$changeId$" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="true" data-delay="4000">
+            <div class="toast-header">
+                <img src="https://cdn-icons-png.flaticon.com/512/1827/1827370.png" height="25px" width="25px" class="rounded mr-2" alt="...">
+                <strong class="mr-auto">Notificação!</strong>
+            </div>
+            <div class="toast-body">
+               $texto$
+               <div>
+                <form method="POST" id="$randomId$" action="/incidente_inserir" class="inline">
+                <input type="hidden" name="incidenteData" value="$incData">
+                <button type="submit" hidden="hidden" class="btn btn-success btn-sm">
+                    Gerar incidente!
+                </button>
+                </form>
+                </div>
+            
+            </div>
+        </div>
+`
+
+        var scripts = document.getElementsByTagName("script");
+        for (var i = 0; i < scripts.length; i++) {
+            if (scripts[i].src) {
+                realCount++;
+            } else {
+                a[i - realCount] = scripts[i].innerHTML;
+                a[i - realCount] = a[i - realCount].replace(/\s/g, "");
+            }
+        }
+        for (var i = 0; i < a.length; i++) {
+            if (a[i].includes('data:[')) {
+                b[j] = a[i];
+                j++;
+            }
+        }
+        b.pop();
+        for (var i = 0; i < b.length; i++) {
+            if (b[i].includes("letb")) {
+                let espString = b[i].split("=");
+                //ip da esp
+                let stringEsp = espString[2].split("[{label:'");
+                stringEsp = stringEsp[1];
+                stringEsp = stringEsp.split("'");
+                stringEsp = stringEsp[0].toString();
+                name = stringEsp;
+                //dado do sensor
+                espData = espString[2];
+                espData = espData.split(":[")
+                espData.shift();
+                espData.shift();
+                espData = espData.toString();
+                espData = espData.split("]");
+                espData.pop();
+                espData.pop();
+                espData = parseInt(espData);
+                message = "A ESP com o ip $esp$ acaba de sofrer um incidente. O valor que o sensor leu foi $sensor$. Prioridade: $prio Urgencia: $urg\n"
+
+                message = message.replace("$esp$", name);
+                message = message.replace("$sensor$", espData);
+
+                if (espData > 10 && espData < 40) {
+                    message = message.replace("$prio", 1);
+                    message = message.replace("$urg", 1);
+                }
+                else if (espData >= 40) {
+                    message = message.replace("$prio", 2);
+                    message = message.replace("$urg", 2);
+                }
+                let random = Math.floor(Math.random() * 100);
+                listaToast.push(random);
+                let date = new Date();
+                dataAtual = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + (date.getDay() + 1) + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                replaceNotifications += notTemplate.replace("$texto$", message).replace("$changeId$", random)
+                    .replace("$incData", "ESP" + "/" + name + "/" + espData + "/" + dataAtual)
+                    .replace("$randomId$", "b" + random);
+                b.pop(i)
+                message = "O computador chamado $nome$ gerou um incidente do tipo $tipo$, o valor lido foi: $vlr$%. Prioridade $prio Urgencia $urg.\n"
+                message = message.replace("$nome$", name);
+            }
+            else {
+                let pcString = b[i].split('let');
+                //ip da esp
+                pcString = pcString[1];
+                pcString = pcString.split("=");
+                name = pcString[0];
+                //dados do pc
+                let pcData = b[i].split('pc');
+                pcData = pcData[0].toString();
+                pcData = pcData.split('data:[')
+                pcData = pcData[1];
+                pcData = pcData.split(']')
+                pcData = pcData[0].toString();
+                pcData = pcData.split(',');
+                cpuData = pcData[0];
+                ramData = pcData[1];
+                hdData = pcData[2];
+                message = "O computador chamado $nome$ gerou um incidente do tipo $tipo$, o valor lido foi: $vlr$%. Prioridade $prio Urgencia $urg.\n"
+                message = message.replace("$nome$", name);
+                if (parseFloat(cpuData) > 60 && parseFloat(cpuData) < 70) {
+                    message = message.replace("$tipo$", "CPU");
+                    message = message.replace("$vlr$", cpuData);
+                    message = message.replace("$prio", 1);
+                    message = message.replace("$urg", 1);
+                    objectPc.nome = name;
+                    objectPc.cpuRead = cpuData;
+                    objectPc.prioridade = 1;
+                    objectPc.urgencia = 1;
+                    let random = Math.floor(Math.random() * 100);
+                    listaToast.push(random);
+                    let date = new Date();
+                    dataAtual = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + (date.getDay() + 1) + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                    replaceNotifications += notTemplate.replace("$texto$", message).replace("$changeId$", random).replace("$incData", "PC/CPU/1/1/" + cpuData + "/" + name + "/" + dataAtual).replace("$randomId$", "b" + random);
+                    message = "O computador chamado $nome$ gerou um incidente do tipo $tipo$, o valor lido foi: $vlr$%. Prioridade $prio Urgencia $urg.\n"
+                    message = message.replace("$nome$", name);
+                }
+                else if (parseFloat(cpuData) > 70 && parseFloat(cpuData) < 90) {
+                    message = message.replace("$tipo$", "CPU");
+                    message = message.replace("$vlr$", cpuData);
+                    message = message.replace("$prio", 2);
+                    message = message.replace("$urg", 2);
+                    objectPc.nome = name;
+                    objectPc.cpuRead = cpuData;
+                    objectPc.prioridade = 2;
+                    objectPc.urgencia = 2;
+                    let random = Math.floor(Math.random() * 100);
+                    listaToast.push(random);
+                    let date = new Date();
+                    dataAtual = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + (date.getDay() + 1) + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                    replaceNotifications += notTemplate.replace("$texto$", message).replace("$changeId$", random).replace("$incData", "PC/CPU/2/2/" + cpuData + "/" + name + "/" + dataAtual).replace("$randomId$", "b" + random);
+                    message = "O computador chamado $nome$ gerou um incidente do tipo $tipo$, o valor lido foi: $vlr$%. Prioridade $prio Urgencia $urg.\n"
+                    message = message.replace("$nome$", name);
+                }
+                else if (parseFloat(cpuData) >= 90) {
+                    message = message.replace("$tipo$", "CPU");
+                    message = message.replace("$vlr$", cpuData);
+                    message = message.replace("$prio", 3);
+                    message = message.replace("$urg", 3);
+                    objectPc.nome = name;
+                    objectPc.cpuRead = cpuData;
+                    objectPc.prioridade = 3;
+                    objectPc.urgencia = 3;
+                    let random = Math.floor(Math.random() * 100);
+                    listaToast.push(random);
+                    let date = new Date();
+                    dataAtual = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + (date.getDay() + 1) + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                    replaceNotifications += notTemplate.replace("$texto$", message).replace("$changeId$", random).replace("$incData", "PC/CPU/3/3/" + cpuData + "/" + name + "/" + dataAtual).replace("$randomId$", "b" + random);
+                    message = "O computador chamado $nome$ gerou um incidente do tipo $tipo$, o valor lido foi: $vlr$%. Prioridade $prio Urgencia $urg.\n"
+                    message = message.replace("$nome$", name);
+                }
+
+                if (parseFloat(ramData) > 60 && parseFloat(ramData) < 70) {
+                    message = message.replace("$tipo$", "RAM");
+                    message = message.replace("$vlr$", ramData);
+                    message = message.replace("$prio", 1);
+                    message = message.replace("$urg", 1);
+                    objectPc.nome = name;
+                    objectPc.ramRead = ramData;
+                    let random = Math.floor(Math.random() * 100);
+                    listaToast.push(random);
+                    let date = new Date();
+                    dataAtual = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + (date.getDay() + 1) + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                    replaceNotifications += notTemplate.replace("$texto$", message).replace("$changeId$", random).replace("$incData", "PC/RAM/1/1/" + ramData + "/" + name + "/" + dataAtual).replace("$randomId$", "b" + random);
+                    message = "O computador chamado $nome$ gerou um incidente do tipo $tipo$, o valor lido foi: $vlr$%. Prioridade $prio Urgencia $urg.\n"
+                    message = message.replace("$nome$", name);
+                }
+                else if (parseFloat(ramData) > 70 && parseFloat(ramData) < 90) {
+                    message = message.replace("$tipo$", "RAM");
+                    message = message.replace("$vlr$", ramData);
+                    message = message.replace("$prio", 2);
+                    message = message.replace("$urg", 2);
+                    objectPc.nome = name;
+                    objectPc.ramRead = ramData;
+                    let random = Math.floor(Math.random() * 100);
+                    listaToast.push(random);
+                    let date = new Date();
+                    dataAtual = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + (date.getDay() + 1) + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                    replaceNotifications += notTemplate.replace("$texto$", message).replace("$changeId$", random).replace("$incData", "PC/RAM/2/2/" + ramData + "/" + name + "/" + dataAtual).replace("$randomId$", "b" + random);
+                    message = "O computador chamado $nome$ gerou um incidente do tipo $tipo$, o valor lido foi: $vlr$%. Prioridade $prio Urgencia $urg.\n"
+                    message = message.replace("$nome$", name);
+                }
+                else if (parseFloat(ramData) > 90) {
+                    message = message.replace("$tipo$", "RAM");
+                    message = message.replace("$vlr$", ramData);
+                    message = message.replace("$prio", 3);
+                    message = message.replace("$urg", 3);
+                    objectPc.nome = name;
+                    objectPc.ramRead = ramData;
+                    let random = Math.floor(Math.random() * 100);
+                    listaToast.push(random);
+                    let date = new Date();
+                    dataAtual = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + (date.getDay() + 1) + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                    replaceNotifications += notTemplate.replace("$texto$", message).replace("$changeId$", random).replace("$incData", "PC/RAM/3/3/" + ramData + "/" + name + "/" + dataAtual).replace("$randomId$", "b" + random);
+                    message = "O computador chamado $nome$ gerou um incidente do tipo $tipo$, o valor lido foi: $vlr$%. Prioridade $prio Urgencia $urg.\n"
+                    message = message.replace("$nome$", name);
+                }
+
+                if (parseFloat(hdData) > 60 && parseFloat(hdData) < 70) {
+                    message = message.replace("$tipo$", "HD");
+                    message = message.replace("$vlr$", hdData);
+                    message = message.replace("$prio", 1);
+                    message = message.replace("$urg", 1);
+                    let random = Math.floor(Math.random() * 100);
+                    listaToast.push(random);
+                    let date = new Date();
+                    dataAtual = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + (date.getDay() + 1) + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                    replaceNotifications += notTemplate.replace("$texto$", message).replace("$changeId$", random).replace("$incData", "PC/HD/1/1/" + hdData + "/" + name + "/" + dataAtual).replace("$randomId$", "b" + random);
+                    message = "O computador chamado $nome$ gerou um incidente do tipo $tipo$, o valor lido foi: $vlr$%. Prioridade $prio Urgencia $urg.\n"
+                    message = message.replace("$nome$", name);
+                }
+                else if (parseFloat(hdData) > 60 && parseFloat(hdData) < 70) {
+                    message = message.replace("$tipo$", "HD");
+                    message = message.replace("$vlr$", hdData);
+                    message = message.replace("$prio", 2);
+                    message = message.replace("$urg", 2);
+                    let random = Math.floor(Math.random() * 100);
+                    listaToast.push(random);
+                    let date = new Date();
+                    dataAtual = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + (date.getDay() + 1) + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                    replaceNotifications += notTemplate.replace("$texto$", message).replace("$changeId$", random).replace("$incData", "PC/HD/2/2/" + hdData + "/" + name + "/" + dataAtual).replace("$randomId$", "b" + random);
+                    message = "O computador chamado $nome$ gerou um incidente do tipo $tipo$, o valor lido foi: $vlr$%. Prioridade $prio Urgencia $urg.\n"
+                    message = message.replace("$nome$", name);
+                }
+                else if (parseFloat(hdData) > 90) {
+                    message = message.replace("$tipo$", "HD");
+                    message = message.replace("$vlr$", hdData);
+                    message = message.replace("$prio", 3);
+                    message = message.replace("$urg", 3);
+                    let random = Math.floor(Math.random() * 100);
+                    listaToast.push(random);
+                    let date = new Date();
+                    dataAtual = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + (date.getDay() + 1) + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                    replaceNotifications += notTemplate.replace("$texto$", message).replace("$changeId$", random).replace("$incData", "PC/HD/3/3/" + hdData + "/" + name + "/" + dataAtual).replace("$randomId$", "b" + random);
+                    message = "O computador chamado $nome$ gerou um incidente do tipo $tipo$, o valor lido foi: $vlr$%. Prioridade $prio Urgencia $urg.\n"
+                    message = message.replace("$nome$", name);
+                }
+            }
+        }
+    </script>
+    <script>
+        $("#notificacoes").html(replaceNotifications);
+        listaToast.forEach((e) => {
+            $(".toast").toast("show");
+        });
+        listaToast.forEach((e) => {
+            $('#b' + e).submit(function (e) {
+                e.preventDefault();
+
+                var url = e.target.action
+                var formData = $(this).serialize()
+                $.post(url, formData, function (response) {
+                    console.log('Incidente criado');
+                })
+            })
+            $('#b' + e).submit();
+        })
+    </script>
+</body>
+
+</html>

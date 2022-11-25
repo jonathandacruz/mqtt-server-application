@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+
+        .b-example-divider {
+            height: 3rem;
+            background-color: rgba(0, 0, 0, .1);
+            border: solid rgba(0, 0, 0, .15);
+            border-width: 1px 0;
+            box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+        }
+
+        .form-control-dark {
+            color: #fff;
+            background-color: var(--bs-dark);
+            border-color: var(--bs-gray);
+        }
+
+        .form-control-dark:focus {
+            color: #fff;
+            background-color: var(--bs-dark);
+            border-color: #fff;
+            box-shadow: 0 0 0 .25rem rgba(255, 255, 255, .25);
+        }
+
+        .bi {
+            vertical-align: -.125em;
+            fill: currentColor;
+        }
+
+        .text-small {
+            font-size: 85%;
+        }
+
+        .dropdown-toggle {
+            outline: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="home" viewBox="0 0 16 16">
+            <path
+                d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4H2.5z" />
+        </symbol>
+        <symbol id="speedometer2" viewBox="0 0 16 16">
+            <path
+                d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4zM3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707zM2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5zm.754-4.246a.389.389 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.389.389 0 0 0-.029-.518z" />
+            <path fill-rule="evenodd"
+                d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.474 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A7.988 7.988 0 0 1 0 10zm8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3z" />
+        </symbol>
+        <symbol id="table" viewBox="0 0 16 16">
+            <path
+                d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z" />
+        </symbol>
+        <symbol id="pc" viewBox="0 0 16 16">
+            <path
+                d="M5 0a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1H5Zm.5 14a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1Zm2 0a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1ZM5 1.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5ZM5.5 3h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1Z" />
+        </symbol>
+        <symbol id="solucao" viewBox="0 0 16 16">
+            <path
+                d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13a.5.5 0 0 1 0 1 .5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1 0-1 .5.5 0 0 1 0-1 .5.5 0 0 1-.46-.302l-.761-1.77a1.964 1.964 0 0 0-.453-.618A5.984 5.984 0 0 1 2 6zm6-5a5 5 0 0 0-3.479 8.592c.263.254.514.564.676.941L5.83 12h4.342l.632-1.467c.162-.377.413-.687.676-.941A5 5 0 0 0 8 1z" />
+        </symbol>
+        <symbol id="eventos" viewBox="0 0 16 16">
+            <path d="M11.46.146A.5.5 0 0 0 11.107 0H4.893a.5.5 0 0 0-.353.146L.146 4.54A.5.5 0 0 0 0 4.893v6.214a.5.5 0 0 0 .146.353l4.394 4.394a.5.5 0 0 0 .353.146h6.214a.5.5 0 0 0 .353-.146l4.394-4.394a.5.5 0 0 0 .146-.353V4.893a.5.5 0 0 0-.146-.353L11.46.146zM8 4c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995A.905.905 0 0 1 8 4zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+        </symbol>
+    </svg>
+
+    <main>
+
+        <header>
+            <div class="px-3 py-2 bg-dark text-white">
+                <div class="container">
+                    <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
+                        <li>
+                            <a href="/" class="nav-link text-white">
+                                <svg class="bi d-block mx-auto mb-1" width="24" height="24">
+                                    <use xlink:href="#home" />
+                                </svg>
+                                Pagina inicial
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/equipamentos" class="nav-link text-white">
+                                <svg class="bi d-block mx-auto mb-1" width="24" height="24">
+                                    <use xlink:href="#speedometer2" />
+                                </svg>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/incidentes" class="nav-link text-white">
+                                <svg class="bi d-block mx-auto mb-1" width="24" height="24">
+                                    <use xlink:href="#table" />
+                                </svg>
+                                Incidentes
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/ics" class="nav-link text-white">
+                                <svg class="bi d-block mx-auto mb-1" width="24" height="24">
+                                    <use xlink:href="#pc" />
+                                </svg>
+                                ICs cadastradas
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/solucoes" class="nav-link text-white">
+                                <svg class="bi d-block mx-auto mb-1" width="24" height="24">
+                                    <use xlink:href="#solucao" />
+                                </svg>
+                                Soluções de contorno
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/eventos" class="nav-link text-white">
+                                <svg class="bi d-block mx-auto mb-1" width="24" height="24">
+                                    <use xlink:href="#eventos" />
+                                </svg>
+                                Cadastro de eventos
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="px-3 py-2 border-bottom mb-3">
+                <div class="container d-flex flex-wrap justify-content-end">
+                    <div class="text-start">
+                        <button type="button" class="btn btn-dark">
+                            Incidentes em aberto <span id="incidentes" class="badge badge-dark"><%=openIncidentes%></span>
+                        </button>
+                        <button type="button" class="btn btn-dark">
+                            Dispositivos conectados <span class="badge badge-dark">
+                                <%= openUsers %>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </header>
+    </main>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+
+
+</body>
+
+</html>
